@@ -26,113 +26,112 @@ function GUI.removeListItem(hList, itemID)
 end
 
 function GUI.createButton(sText, x, y, w, h, textColor, bkColor, alttextColor, altbkColor)
-  tButton = {}
-  tButton.type = "button"
-  tButton.id = tObj.index + 1
-  tButton.text = sText
-  tButton.onClick = nil --funcOnclick
-  tButton.toggle = true --bToggleMode
-  tButton.x = x
-  tButton.y = y
-  tButton.w = w
-  tButton.h = h
-  tButton.state = false
-  tButton.timeout = 1
-  tButton.bkColor = bkColor
-  tButton.textColor = textColor
-  tButton.altbkColor = altbkColor
-  tButton.alttextColor = alttextColor
-  tButton.monitor = term --monitor
+  Button = {}
+  Button.type = "button"
+  Button.id = tObj.index + 1
+  Button.text = sText
+  Button.onClick = nil --funcOnclick
+  Button.toggle = true --bToggleMode
+  Button.x = x
+  Button.y = y
+  Button.w = w
+  Button.h = h
+  Button.state = false
+  Button.timeout = 1
+  Button.bkColor = bkColor
+  Button.textColor = textColor
+  Button.altbkColor = altbkColor
+  Button.alttextColor = alttextColor
+  Button.monitor = term --monitor
   tObj.index = tObj.index + 1
-  tObj[tObj.index] = tButton
-  return tButton
+  tObj[tObj.index] = Button
+  return Button
 end
 
 function GUI.createLabel(sText, x, y, bkColor, textColor)
-  tText = {}
-  tText.type = "label"
-  tText.id = tObj.index + 1
-  tText.text = sText
-  tText.x = x
-  tText.y = y
-  tText.bkColor = bkColor
-  tText.textColor = textColor
-  tText.monitor = term --monitor
+  Text = {}
+  Text.type = "label"
+  Text.id = tObj.index + 1
+  Text.text = sText
+  Text.x = x
+  Text.y = y
+  Text.bkColor = bkColor
+  Text.textColor = textColor
+  Text.monitor = term --monitor
   tObj.index = tObj.index + 1
-  tObj[tObj.index] = tText
-  return tText
+  tObj[tObj.index] = Text
+  return Text
 end
 
 function GUI.createList(x, y, w, h, bkColor, textColor, selectbkColor, selectTextColor)
-  tList = {}
-  tList.type = "list"
-  tList.id = tObj.index + 1
-  tList.x = x
-  tList.y = y
-  tList.w = w
-  tList.h = h
-  tList.bkColor = bkColor
-  tList.textColor = textColor
-  tList.selectbkColor = selectbkColor
-  tList.selecttextColor = selectTextColor
-  tList.entries = {}
-  tList.delCount = 0
-  tList.selection = 0
-  tList.scrollactive = false
-  tList.scroll = 1
-  tList.onClick = nil
-  tList.buttonColor = colors.gray
-  tList.buttonbkColor = colors.lightGray
-  tList.buttonTextColor = colors.black
-  tList.monitor = term --monitor
+  List = {}
+  List.type = "list"
+  List.id = tObj.index + 1
+  List.x = x
+  List.y = y
+  List.w = w
+  List.h = h
+  List.bkColor = bkColor
+  List.textColor = textColor
+  List.selectbkColor = selectbkColor
+  List.selecttextColor = selectTextColor
+  List.entries = {}
+  List.delCount = 0
+  List.selection = 0
+  List.scrollactive = false
+  List.scroll = 1
+  List.onClick = nil
+  List.buttonColor = colors.gray
+  List.buttonbkColor = colors.lightGray
+  List.buttonTextColor = colors.black
+  List.monitor = term --monitor
   tObj.index = tObj.index + 1
-  tObj[tObj.index] = tList
-  return tList
+  tObj[tObj.index] = List
+  return List
 end
 
 function GUI.createProgressBar(x, y, w, h, color, value)
-  tProg = {}
-  tProg.type = "progress"
-  tProg.id = tObj.index + 1
-  tProg.direction = 0 --0 = horizontal, 1 = vertical
-  tProg.x = x
-  tProg.y = y
-  tProg.w = w
-  tProg.h = h
-  tProg.color = color
-  tProg.colorB = colors.gray
-  tProg.value = value
-  tProg.monitor = term --monitor
+  ProgressBar = {}
+  ProgressBar.type = "progress"
+  ProgressBar.id = tObj.index + 1
+  ProgressBar.direction = 0 --0 = horizontal, 1 = vertical
+  ProgressBar.x = x
+  ProgressBar.y = y
+  ProgressBar.w = w
+  ProgressBar.h = h
+  ProgressBar.color = color
+  ProgressBar.colorB = colors.gray
+  ProgressBar.value = value
+  ProgressBar.monitor = term --monitor
   tObj.index = tObj.index + 1
-  tObj[tObj.index] = tProg
-  return tProg
-  
+  tObj[tObj.index] = ProgressBar
+  return ProgressBar
 end
 
-function GUI.createListEntry(tList, sText)
-  table.insert(tList.entries, sText)
-  return #tList.entries
+function GUI.createListEntry(List, sText)
+  table.insert(List.entries, sText)
+  return #List.entries
 end
 
 function GUI.createInput(sText, x, y, w, h, bkColor, textColor)
-  tInput = {}
-  tInput.type = "input"
-  tInput.id = tObj.index + 1
-  tInput.text = sText
-  tInput.x = x
-  tInput.y = y
-  tInput.w = w
-  tInput.h = h
-  tInput.bkColor = bkColor
-  tInput.textColor = textColor
-  tInput.borderColor = colors.lightGray
-  tInput.selected = false
-  tInput.monitor = term --monitor
-  tInput.cursorPos = nil
-  tInput.textOffset = 0 -- offset for when text overflows. Marks start of text window. e.g.: This i[s som]e text - offset is 6. Width of the input is 5.
+  Input = {}
+  Input.type = "input"
+  Input.id = tObj.index + 1
+  Input.text = sText
+  Input.x = x
+  Input.y = y
+  Input.w = w
+  Input.h = h
+  Input.bkColor = bkColor
+  Input.textColor = textColor
+  Input.borderColor = colors.lightGray
+  Input.selected = false
+  Input.monitor = term --monitor
+  Input.cursorPos = nil
+  Input.textOffset = 0 -- offset for when text overflows. Marks start of text window. e.g.: This i[s som]e text - offset is 6. Width of the input is 5.
   tObj.index = tObj.index + 1
-  tObj[tObj.index] = tInput
-  return tInput
+  tObj[tObj.index] = Input
+  return Input
 end
 
 function GUI.fillRegion(mon, startX, startY, endX, endY, color)
