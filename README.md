@@ -1,8 +1,6 @@
 # CC-GUI
 Computercraft toolkit for creating graphical user interfaces
 
-**This code is very old (see hungarian notation) and being adapted for current Computercraft. Expect slight changes in behavior or usage in the next commits.**
-
 features:
 - integrated terminal display: yes
 - external monitor display: yes

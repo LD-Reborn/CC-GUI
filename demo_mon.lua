@@ -1,89 +1,115 @@
 GUI = require("GUI")
+Theme = require("Theme")
 -- Prepare monitor
-myMonitor = peripheral.wrap("left")
-myMonitor.setBackgroundColor(colors.black)
-myMonitor.setTextScale(0.5)
-myMonitor.clear()
+Monitor = peripheral.wrap("left")
+Monitor.setBackgroundColor(colors.black)
+Monitor.setTextScale(0.5)
+Monitor.clear()
 
-hButton1 = 0
-hButton2 = 0
-hButton3 = 0
 flashLeft = false
 flashUp = false
 
-function button(param)
+function toggleBarDirection(param)
   id = param.id
   state = param.state
-  if id == hButton1.id then
-    flashLeft = state
-  elseif id == hButton2.id then
-    flashUp = state
-  elseif id == hButton3.id then
-    if state then
-      hProgress.direction = 0
-      hButton3.text = "vertical bar"
-    else
-      hProgress.direction = 1
-      hButton3.text = "horizontal bar"
-    end
+  if state then
+    Progressbar.direction = 0
+    ProgressbarButton.text = "vertical bar"
+  else
+    Progressbar.direction = 1
+    ProgressbarButton.text = "horizontal bar"
   end
 end
 
-hLabel1 = GUI.createLabel("CC-GUI Demo", 20, 5, colors.gray, colors.white)
-hLabel1.monitor = myMonitor
+function toggleFlashRedstone(param)
+  id = param.id
+  state = param.state
+  if id == ButtonsFlashRight.id then
+    flashLeft = state
+  elseif id == ButtonsFlashUp.id then
+    flashUp = state
+  end
+end
+
+function toggleListSize(param)
+  state = param.state
+  if state == true then
+    List.h = 20
+  else
+    List.h = 10
+  end
+end
+
+-- Create title label
+TitleLabel = GUI.createLabel("CC-GUI Demo", 22, 2, Theme.backgroundColor, Theme.textColor)
+TitleLabel.monitor = Monitor
+
 -- Create demo buttons
-hLabel2 = GUI.createLabel("Demo - buttons", 20, 8, colors.gray, colors.white)
-hLabel2.monitor = myMonitor
-hButton1 = GUI.createButton("flash right", 10, 10, 15, 5, colors.green, colors.white, colors.black, colors.red)
-hButton1.monitor = myMonitor
-hButton1.onClick = button
-hButton1.toggle = true
-hButton2 = GUI.createButton("flash up", 28, 10, 15, 5, colors.blue, colors.lime, colors.yellow, colors.magenta)
-hButton2.monitor = myMonitor
-hButton2.onClick = button
-hButton2.toggle = true
+ButtonsLabel = GUI.createLabel("Demo - buttons", 20, 5, Theme.backgroundColor, Theme.textColor)
+ButtonsLabel.monitor = Monitor
+
+ButtonsFlashRight = GUI.createButton("flash right", 10, 7, 15, 5, Theme.textColor, Theme.primaryColor, Theme.textColor, Theme.successColor)
+ButtonsFlashRight.monitor = Monitor
+ButtonsFlashRight.onClick = toggleFlashRedstone
+ButtonsFlashRight.toggle = true
+
+ButtonsFlashUp = GUI.createButton("flash up", 28, 7, 15, 5, Theme.textColor, Theme.primaryColor, Theme.textColor, Theme.successColor)
+ButtonsFlashUp.monitor = Monitor
+ButtonsFlashUp.onClick = toggleFlashRedstone
+ButtonsFlashUp.toggle = true
+
 -- Create demo progress bar
-hLabel3 = GUI.createLabel("Demo - progress bar", 19, 18, colors.gray, colors.white)
-hLabel3.monitor = myMonitor
-hButton3 = GUI.createButton("horizontal bar", 5, 20, 20, 5, colors.white, colors.green, colors.green, colors.white)
-hButton3.monitor = myMonitor
-hButton3.onClick = button
-hButton3.toggle = true
-hLabel4 = GUI.createLabel("0%", 22 + 19, 19, colors.black, colors.white)
-hLabel4.monitor = myMonitor
-hProgress = GUI.createProgressBar(11 + 19, 21, 25, 25, colors.green, 0)
-hProgress.monitor = myMonitor
-hProgress.direction = 1
+ProgressbarLabel = GUI.createLabel("Demo - progress bar", 6, 15, Theme.backgroundColor, Theme.textColor)
+ProgressbarLabel.monitor = Monitor
+
+ProgressbarButton = GUI.createButton("horizontal bar", 5, 17, 20, 5, Theme.textColor, Theme.primaryColor, Theme.textColor, Theme.secondaryColor)
+ProgressbarButton.monitor = Monitor
+ProgressbarButton.onClick = toggleBarDirection
+ProgressbarButton.toggle = true
+
+ProgressbarLabel = GUI.createLabel("0%", 9 + 5, 24, Theme.backgroundColor, Theme.textColor)
+ProgressbarLabel.monitor = Monitor
+
+Progressbar = GUI.createProgressBar(0 + 5, 26, 20, 20, Theme.successColor, 0)
+Progressbar.monitor = Monitor
+Progressbar.direction = 1
+
 -- Create demo list
-hLabel5 = GUI.createLabel("Demo - list", 62, 7, colors.gray, colors.white)
-hLabel5.monitor = myMonitor
-hList = GUI.createList(63, 10, 15, 10, colors.gray, colors.white, colors.lime, colors.white)
-hList.monitor = myMonitor
-GUI.createListEntry(hList, "Demo entry 1")
-GUI.createListEntry(hList, "Demo entry 2")
-GUI.createListEntry(hList, "Demo entry 3")
+ListLabel = GUI.createLabel("Demo - list", 35, 15, Theme.backgroundColor, Theme.textColor)
+ListLabel.monitor = Monitor
+
+ListButton = GUI.createButton("toggle size", 30, 17, 20, 5, Theme.textColor, Theme.primaryColor, Theme.textColor, Theme.secondaryColor)
+ListButton.monitor = Monitor
+ListButton.onClick = toggleListSize
+ListButton.toggle = true
+
+List = GUI.createList(30, 26, 20, 10, Theme.backgroundColor, Theme.textColor, Theme.secondaryColor, Theme.textColor, Theme.borderColor)
+List.monitor = Monitor
+for i = 1, 20 do
+  GUI.createListEntry(List, "Demo entry " .. i)
+end
 
 -- Main loop logic
-iProgress = 0
-restoneFlashInterval = 0.5
+local progessCounter = 0
+local restoneFlashInterval = 0.5
 os.startTimer(restoneFlashInterval) -- For the redstone flashing
 while true do
   GUI.drawAll()
   events = {os.pullEvent()}
   GUI.handleEvent(events)
+
   if events[1] == "timer" then
     os.startTimer(restoneFlashInterval) -- restart redstone flash timer
     if flashLeft then rs.setOutput("right", not rs.getOutput("left")) end
     if flashUp then rs.setOutput("top", not rs.getOutput("top")) end
-    if iProgress < 100 then
-      iProgress = iProgress + 1
-      if iProgress > 75 then hProgress.color = colors.red end
-      hProgress.value = iProgress
-      hLabel4.text = iProgress .. "%"
+    if progessCounter < 100 then
+      progessCounter = progessCounter + 1
+      if progessCounter > 75 then Progressbar.color = colors.red end
+      Progressbar.value = progessCounter
+      ProgressbarLabel.text = progessCounter .. "%"
     else
-      hProgress.color = colors.green
-      iProgress = 0
+      Progressbar.color = colors.green
+      progessCounter = 0
     end
   end
 end
-print("end")

@@ -63,7 +63,7 @@ function GUI.createLabel(text, x, y, backgroundColor, textColor)
   return Text
 end
 
-function GUI.createList(x, y, w, h, backgroundColor, textColor, selectedBackgroundColor, selectedTextColor)
+function GUI.createList(x, y, w, h, backgroundColor, textColor, selectedBackgroundColor, selectedTextColor, borderColor)
   local List = {}
   List.type = "list"
   List.id = GUI.Controls.index + 1
@@ -81,9 +81,10 @@ function GUI.createList(x, y, w, h, backgroundColor, textColor, selectedBackgrou
   List.scrollActive = false
   List.scroll = 1
   List.onClick = nil
-  List.buttonColor = colors.gray
-  List.buttonbackgroundColor = colors.lightGray
-  List.buttonTextColor = colors.black
+  List.borderColor = borderColor or backgroundColor
+  List.sidebarBackgroundColor = List.borderColor
+  List.buttonColor = textColor
+  List.buttonbackgroundColor = backgroundColor
   List.monitor = term --monitor
   GUI.Controls.index = GUI.Controls.index + 1
   GUI.Controls[GUI.Controls.index] = List
@@ -180,11 +181,11 @@ function GUI.drawAll()
         ControlElement.monitor.setBackgroundColor(ControlElement.backgroundColor)
         ControlElement.monitor.write(ControlElement.text)
       elseif ControlElement.type == "list" then
-        GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, colors.cyan)
-        GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement. h, colors.white)
+        GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, ControlElement.sidebarBackgroundColor)
+        GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement. h, ControlElement.backgroundColor)
         ControlElement.scrollActive = #ControlElement.entries - ControlElement.delCount > ControlElement.h
         if ControlElement.scrollActive then
-          ControlElement.monitor.setBackgroundColor(ControlElement.buttonColor)
+          ControlElement.monitor.setBackgroundColor(ControlElement.sidebarBackgroundColor)
           for i = ControlElement.y, ControlElement.y + ControlElement.h do
             ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w - 1, i)
             ControlElement.monitor.write(" ")
@@ -194,7 +195,7 @@ function GUI.drawAll()
             ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, i)
             ControlElement.monitor.write(" ")
           end
-          ControlElement.monitor.setBackgroundColor(ControlElement.buttonColor)
+          ControlElement.monitor.setBackgroundColor(ControlElement.sidebarBackgroundColor)
           ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 2))
           ControlElement.monitor.write(" ")
           ControlElement.monitor.setBackgroundColor(ControlElement.buttonbackgroundColor)
