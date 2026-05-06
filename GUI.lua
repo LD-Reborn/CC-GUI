@@ -129,6 +129,7 @@ function GUI.createInput(sText, x, y, w, h, bkColor, textColor)
   tInput.selected = false
   tInput.monitor = term --monitor
   tInput.cursorPos = nil
+  tInput.textOffset = 0 -- offset for when text overflows. Marks start of text window. e.g.: This i[s som]e text - offset is 6. Width of the input is 5.
   tObj.index = tObj.index + 1
   tObj[tObj.index] = tInput
   return tInput
@@ -245,19 +246,36 @@ function GUI.drawAll()
           end
         end
       elseif tCtrl.type == "input" then
-        GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + tCtrl.w, tCtrl.y, tCtrl.bkColor)
-        GUI.drawRect(tCtrl.monitor, tCtrl.x - 1, tCtrl.y - 1, tCtrl.x + tCtrl.w + 1, tCtrl.y + 1, tCtrl.borderColor)
+        GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + tCtrl.w - 1, tCtrl.y, tCtrl.bkColor)
+        GUI.drawRect(tCtrl.monitor, tCtrl.x - 1, tCtrl.y - 1, tCtrl.x + tCtrl.w, tCtrl.y + 1, tCtrl.borderColor)
+        local text = tCtrl.text
+        if tCtrl.textOffset > 0 then
+          text = string.sub(text, tCtrl.textOffset + 1)
+          tCtrl.monitor.setCursorPos(tCtrl.x - 1, tCtrl.y)
+          tCtrl.monitor.setBackgroundColor(tCtrl.borderColor)
+          tCtrl.monitor.setTextColor(tCtrl.textColor)
+          tCtrl.monitor.write("<")
+        end
+        local textLen = string.len(text)
+        if textLen > tCtrl.w then
+          text = string.sub(text, 1, tCtrl.w)
+          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, tCtrl.y)
+          tCtrl.monitor.setBackgroundColor(tCtrl.borderColor)
+          tCtrl.monitor.setTextColor(tCtrl.textColor)
+          tCtrl.monitor.write(">")
+        end
         tCtrl.monitor.setCursorPos(tCtrl.x, tCtrl.y)
         tCtrl.monitor.setBackgroundColor(tCtrl.bkColor)
         tCtrl.monitor.setTextColor(tCtrl.textColor)
-        tCtrl.monitor.write(tCtrl.text)
+        tCtrl.monitor.write(text)
         if tCtrl.cursorPos ~= nil then
+          local printChar
           if tCtrl.cursorPos > string.len(tCtrl.text) then
             printChar = " "
           else
             printChar = string.sub(tCtrl.text, tCtrl.cursorPos, tCtrl.cursorPos)
           end
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.cursorPos - 1, tCtrl.y)
+          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.cursorPos - 1 - tCtrl.textOffset, tCtrl.y)
           tCtrl.monitor.setBackgroundColor(tCtrl.textColor)
           tCtrl.monitor.setTextColor(tCtrl.bkColor)
           tCtrl.monitor.write(printChar)
@@ -347,7 +365,9 @@ function GUI.handleEvent(event) -- event = {os.pullEvent()}
               end
             elseif tCtrl.type == "input" then
               if GUI._2DhitA(event[3], event[4], tCtrl.x, tCtrl.y, tCtrl.w, tCtrl.h) then
-                tCtrl.cursorPos = math.min(event[3] - tCtrl.x + 1, string.len(tCtrl.text) + 1)
+                local relativeClickPosition = math.min(event[3] - tCtrl.x + 1, string.len(tCtrl.text) + 1)
+                local textLen = string.len(tCtrl.text)
+                tCtrl.cursorPos = relativeClickPosition + tCtrl.textOffset
               elseif tCtrl.cursorPos ~= nil then
                 tCtrl.cursorPos = nil
               end
@@ -366,26 +386,43 @@ function GUI.handleEvent(event) -- event = {os.pullEvent()}
         end
       end
     end
-  elseif event[1] == "key_up" then
-    local keyName = keys.getName(event[2]) or "#"
+  elseif event[1] == "char" or event[1] == "key_up" then
+    local eventIsChar = event[1] == "char"
+    local eventIsKeyUp = event[1] == "key_up"
+    local char = event[2]
+    local keyName
+    if eventIsKeyUp then
+      keyName = keys.getName(char)
+      if keyName == "space" then
+        keyName = " "
+      end
+    elseif eventIsChar then
+      keyName = char
+    end
     if keyName ~= nil then
       for id, tCtrl in pairs(tObj) do
         if id ~= "index" and tCtrl.type == "input" and tCtrl.cursorPos ~= nil then
-          if keyName == "space" then
-            keyName = " "
-          end
           if keyName == "backspace" then
             tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 2, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos)
             tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
+            if tCtrl.textOffset > 0 then
+              tCtrl.textOffset = tCtrl.textOffset - 1
+            end
           elseif keyName == "delete" then
             tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 1, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos + 1)
           elseif keyName == "left" then
             tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
           elseif keyName == "right" then
             tCtrl.cursorPos = math.min(tCtrl.cursorPos + 1, string.len(tCtrl.text) + 1)
-          elseif string.len(keyName) == 1 and keys.getName ~= "#" then
+          elseif eventIsChar then
             tCtrl.text = string.sub(tCtrl.text, 1, tCtrl.cursorPos - 1) .. keyName .. string.sub(tCtrl.text, tCtrl.cursorPos)
             tCtrl.cursorPos = tCtrl.cursorPos + 1
+          end
+          if tCtrl.cursorPos <= tCtrl.textOffset then
+            tCtrl.textOffset = tCtrl.textOffset - 1
+          end
+          if tCtrl.cursorPos - tCtrl.textOffset > tCtrl.w then
+            tCtrl.textOffset = tCtrl.textOffset + 1
           end
         end
       end
