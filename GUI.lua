@@ -149,6 +149,20 @@ function GUI.drawRect(Monitor, startX, startY, endX, endY, color)
   if isMonitor then term.redirect(term.native()) end
 end
 
+function GUI.drawLine(Monitor, startX, startY, endX, endY, color)
+  local isMonitor = Monitor ~= term
+  if isMonitor then term.redirect(Monitor) end
+  paintutils.drawLine(startX, startY, endX, endY, color)
+  if isMonitor then term.redirect(term.native()) end
+end
+
+function GUI.drawPixel(Monitor, x, y, color)
+  local isMonitor = Monitor ~= term
+  if isMonitor then term.redirect(Monitor) end
+  paintutils.drawPixel(x, y, color)
+  if isMonitor then term.redirect(term.native()) end
+end
+
 function GUI.drawAll()
   for id, ControlElement in pairs(GUI.Controls) do
     if id ~= "index" then
@@ -185,19 +199,9 @@ function GUI.drawAll()
         GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement. h, ControlElement.backgroundColor)
         ControlElement.scrollActive = #ControlElement.entries - ControlElement.delCount > ControlElement.h
         if ControlElement.scrollActive then
-          ControlElement.monitor.setBackgroundColor(ControlElement.sidebarBackgroundColor)
-          for i = ControlElement.y, ControlElement.y + ControlElement.h do
-            ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w - 1, i)
-            ControlElement.monitor.write(" ")
-          end
-          ControlElement.monitor.setBackgroundColor(ControlElement.buttonbackgroundColor)
-          for i = ControlElement.y, ControlElement.y + ControlElement.h do
-            ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, i)
-            ControlElement.monitor.write(" ")
-          end
-          ControlElement.monitor.setBackgroundColor(ControlElement.sidebarBackgroundColor)
-          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 2))
-          ControlElement.monitor.write(" ")
+          GUI.drawLine(ControlElement.monitor, ControlElement.x + ControlElement.w - 1, ControlElement.y, ControlElement.x + ControlElement.w - 1, ControlElement.y + ControlElement.h, ControlElement.sidebarBackgroundColor)
+          GUI.drawLine(ControlElement.monitor, ControlElement.x + ControlElement.w, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement.h, ControlElement.buttonbackgroundColor)
+          GUI.drawPixel(ControlElement.monitor, ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 2), ControlElement.sidebarBackgroundColor)
           ControlElement.monitor.setBackgroundColor(ControlElement.buttonbackgroundColor)
           ControlElement.monitor.setTextColor(ControlElement.buttonColor)
           ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 4))
