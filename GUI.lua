@@ -2,6 +2,14 @@ local GUI = {}
 GUI.Controls = {["index"]=0}
 backgroundColor = colors.black
 
+local function withMonitor(Monitor, func)
+  local isMonitor = Monitor ~= term
+  if isMonitor then term.redirect(Monitor) end
+  local result = func()
+  if isMonitor then term.redirect(term.native()) end
+  return result
+end
+
 function GUI.getObj(id)
   return GUI.Controls[id]
 end
@@ -136,38 +144,28 @@ function GUI.createInput(text, x, y, w, h, backgroundColor, textColor)
 end
 
 function GUI.fillRegion(Monitor, startX, startY, endX, endY, color)
-  local isMonitor = Monitor ~= term
-  if isMonitor then term.redirect(Monitor) end
-  paintutils.drawFilledBox(startX, startY, endX, endY, color)
-  if isMonitor then term.redirect(term.native()) end
+  withMonitor(Monitor, function() paintutils.drawFilledBox(startX, startY, endX, endY, color) end)
 end
 
 function GUI.drawRect(Monitor, startX, startY, endX, endY, color)
-  local isMonitor = Monitor ~= term
-  if isMonitor then term.redirect(Monitor) end
-  paintutils.drawBox(startX, startY, endX, endY, color)
-  if isMonitor then term.redirect(term.native()) end
+  withMonitor(Monitor, function() paintutils.drawBox(startX, startY, endX, endY, color) end)
 end
 
 function GUI.drawLine(Monitor, startX, startY, endX, endY, color)
-  local isMonitor = Monitor ~= term
-  if isMonitor then term.redirect(Monitor) end
-  paintutils.drawLine(startX, startY, endX, endY, color)
-  if isMonitor then term.redirect(term.native()) end
+  withMonitor(Monitor, function() paintutils.drawLine(startX, startY, endX, endY, color) end)
 end
 
 function GUI.drawPixel(Monitor, x, y, color)
-  local isMonitor = Monitor ~= term
-  if isMonitor then term.redirect(Monitor) end
-  paintutils.drawPixel(x, y, color)
-  if isMonitor then term.redirect(term.native()) end
+  withMonitor(Monitor, function() paintutils.drawPixel(x, y, color) end)
 end
 
 function GUI.drawText(Monitor, x, y, textColor, backgroundColor, text)
-  Monitor.setCursorPos(x, y)
-  Monitor.setTextColor(textColor)
-  Monitor.setBackgroundColor(backgroundColor)
-  Monitor.write(text)
+  withMonitor(Monitor, function()
+    Monitor.setCursorPos(x, y)
+    Monitor.setTextColor(textColor)
+    Monitor.setBackgroundColor(backgroundColor)
+    Monitor.write(text)
+  end)
 end
 
 function GUI.drawAll()
