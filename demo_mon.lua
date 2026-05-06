@@ -1,8 +1,10 @@
 GUI = require("GUI")
+-- Prepare monitor
 myMonitor = peripheral.wrap("left")
 myMonitor.setBackgroundColor(colors.black)
 myMonitor.setTextScale(0.5)
 myMonitor.clear()
+
 hButton1 = 0
 hButton2 = 0
 hButton3 = 0
@@ -29,6 +31,7 @@ end
 
 hLabel1 = GUI.createLabel("CC-GUI Demo", 20, 5, colors.gray, colors.white)
 hLabel1.monitor = myMonitor
+-- Create demo buttons
 hLabel2 = GUI.createLabel("Demo - buttons", 20, 8, colors.gray, colors.white)
 hLabel2.monitor = myMonitor
 hButton1 = GUI.createButton("flash right", 10, 10, 15, 5, colors.green, colors.white, colors.black, colors.red)
@@ -39,6 +42,7 @@ hButton2 = GUI.createButton("flash up", 28, 10, 15, 5, colors.blue, colors.lime,
 hButton2.monitor = myMonitor
 hButton2.onClick = button
 hButton2.toggle = true
+-- Create demo progress bar
 hLabel3 = GUI.createLabel("Demo - progress bar", 19, 18, colors.gray, colors.white)
 hLabel3.monitor = myMonitor
 hButton3 = GUI.createButton("horizontal bar", 5, 20, 20, 5, colors.white, colors.green, colors.green, colors.white)
@@ -50,22 +54,25 @@ hLabel4.monitor = myMonitor
 hProgress = GUI.createProgressBar(11 + 19, 21, 25, 25, colors.green, 0)
 hProgress.monitor = myMonitor
 hProgress.direction = 1
-hLabel5 = GUI.createLabel("Demo - progress bar", 62, 7, colors.gray, colors.white)
+-- Create demo list
+hLabel5 = GUI.createLabel("Demo - list", 62, 7, colors.gray, colors.white)
 hLabel5.monitor = myMonitor
 hList = GUI.createList(63, 10, 15, 10, colors.gray, colors.white, colors.lime, colors.white)
 hList.monitor = myMonitor
 GUI.createListEntry(hList, "Demo entry 1")
 GUI.createListEntry(hList, "Demo entry 2")
 GUI.createListEntry(hList, "Demo entry 3")
+
+-- Main loop logic
 iProgress = 0
-os.startTimer(0.5)
+restoneFlashInterval = 0.5
+os.startTimer(restoneFlashInterval) -- For the redstone flashing
 while true do
-  
   GUI.drawAll()
   events = {os.pullEvent()}
   GUI.handleEvent(events)
   if events[1] == "timer" then
-    os.startTimer(0.5)
+    os.startTimer(restoneFlashInterval) -- restart redstone flash timer
     if flashLeft then rs.setOutput("right", not rs.getOutput("left")) end
     if flashUp then rs.setOutput("top", not rs.getOutput("top")) end
     if iProgress < 100 then

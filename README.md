@@ -14,6 +14,9 @@ features:
   - list: yes
   - progress bar: yes
   - input: WIP - buggy
+  - textbox: planned
+  - checkbox: planned
+  - radio buttons: planned
 
 ## Setup
 To install CC-GUI, enter this command in the CLI or download the `GUI.lua` file from the list above:
@@ -22,7 +25,7 @@ wget https://raw.githubusercontent.com/LD-Reborn/CC-GUI/main/GUI.lua
 ```
 
 ## Usage
-See `guitest.lua` for an example with a monitor.
+See `demo_mon.lua` for an example with a monitor.
 
 ## FAQ
 ### Will over-the-network rendering become a feature?

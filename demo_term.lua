@@ -26,25 +26,17 @@ function button(param)
   end
 end
 hLabel1 = GUI.createLabel("MyAwesomeGUI", 5, 1, colors.gray, colors.white)
---hLabel1.monitor = myMonitor
---hButton1 = GUI.createButton("flash left", button, true, 5, 25, 15, 5, colors.green, colors.white, colors.black, colors.red, myMonitor)
 hButton1 = GUI.createButton("flash left", 2, 3, 15, 5, colors.green, colors.white, colors.black, colors.red)
---hButton1.monitor = myMonitor
 hButton1.onClick = button
 hButton1.toggle = true
---hButton2 = GUI.createButton("flash up", button, true, 25, 28, 20, 9, colors.blue, colors.lime, colors.yellow, colors.magenta, myMonitor)
 hButton2 = GUI.createButton("flash up", 2, 8, 15, 5, colors.blue, colors.lime, colors.yellow, colors.magenta)
---hButton2.monitor = myMonitor
 hButton2.onClick = button
 hButton2.toggle = true
 hButton3 = GUI.createButton("horizontal bar", 1, 13, 16, 4, colors.white, colors.green, colors.green, colors.white)
---hButton3.monitor = myMonitor
 hButton3.onClick = button
 hButton3.toggle = true
 hLabel2 = GUI.createLabel("0%", 25, 2, colors.black, colors.white)
---hLabel2.monitor = myMonitor
 hProgress = GUI.createProgressBar(20, 4, 15, 8, colors.green, 0)
---hProgress.monitor = myMonitor
 hProgress.direction = 1
 
 hInput = GUI.createInput("testInput", 20, 16, 10, 5, colors.yellow, colors.black)
@@ -59,32 +51,13 @@ while true do
   
   if events[1] == "timer" then
     os.startTimer(0.5)
-    --print(textutils.serialize(events))
     if flashLeft then rs.setOutput("left", not rs.getOutput("left")) end
     if flashUp then rs.setOutput("top", not rs.getOutput("top")) end
     if iProgress < 100 then
       iProgress = iProgress + 1
       if iProgress > 75 then hProgress.color = colors.red end
-      --print("---")
-      --print(textutils.serialize(GUI["tObj"][hProgress]))
-      --print(GUI.tObj.index)
-      --print(hProgress)
-      --tempProg = GUI.getObj(hProgress)
-      --print("Main..:")
-      --print(textutils.serialize(tempProg))
-      --tempProg = tempProg.value
-      --print("tP:")
-      --print(tempProg)
-      --print(textutils.serialize(tempProg))
-      --print(".-----")
-      --print(iProgress)
-      --print(hProgress.value)
       hProgress.value = iProgress
       hLabel2.text = iProgress .. "%"
-      --print(hProgress.value)
-      --print(".----")
-      --tempProg = iProgress
-      --print(textutils.serialize(tempProg))
     else
       hProgress.color = colors.green
       iProgress = 0
