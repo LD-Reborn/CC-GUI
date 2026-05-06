@@ -163,6 +163,13 @@ function GUI.drawPixel(Monitor, x, y, color)
   if isMonitor then term.redirect(term.native()) end
 end
 
+function GUI.drawText(Monitor, x, y, textColor, backgroundColor, text)
+  Monitor.setCursorPos(x, y)
+  Monitor.setTextColor(textColor)
+  Monitor.setBackgroundColor(backgroundColor)
+  Monitor.write(text)
+end
+
 function GUI.drawAll()
   for id, ControlElement in pairs(GUI.Controls) do
     if id ~= "index" then
@@ -185,15 +192,9 @@ function GUI.drawAll()
         GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement.h, backgroundColor)
         local textY = ControlElement.y + (ControlElement.h / 2)
         local textX = ControlElement.x + (ControlElement.w / 2) - (ControlElement.text:len() / 2)
-        ControlElement.monitor.setCursorPos(textX, textY)
-        ControlElement.monitor.setTextColor(textColor)
-        ControlElement.monitor.setBackgroundColor(backgroundColor)
-        ControlElement.monitor.write(ControlElement.text)
+        GUI.drawText(ControlElement.monitor, textX, textY, textColor, backgroundColor, ControlElement.text)
       elseif ControlElement.type == "label" then
-        ControlElement.monitor.setCursorPos(ControlElement.x, ControlElement.y)
-        ControlElement.monitor.setTextColor(ControlElement.textColor)
-        ControlElement.monitor.setBackgroundColor(ControlElement.backgroundColor)
-        ControlElement.monitor.write(ControlElement.text)
+        GUI.drawText(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.textColor, ControlElement.backgroundColor, ControlElement.text)
       elseif ControlElement.type == "list" then
         GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, ControlElement.sidebarBackgroundColor)
         GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement. h, ControlElement.backgroundColor)
@@ -223,8 +224,8 @@ function GUI.drawAll()
                 ControlElement.monitor.setTextColor(ControlElement.textColor)
                 ControlElement.monitor.setBackgroundColor(ControlElement.backgroundColor)
               end
+              ControlElement.monitor.write(item)
             end
-            ControlElement.monitor.write(item)
           end
         end
       elseif ControlElement.type == "input" then
@@ -233,23 +234,14 @@ function GUI.drawAll()
         local text = ControlElement.text
         if ControlElement.textOffset > 0 then
           text = string.sub(text, ControlElement.textOffset + 1)
-          ControlElement.monitor.setCursorPos(ControlElement.x - 1, ControlElement.y)
-          ControlElement.monitor.setBackgroundColor(ControlElement.borderColor)
-          ControlElement.monitor.setTextColor(ControlElement.textColor)
-          ControlElement.monitor.write("<")
+          GUI.drawText(ControlElement.monitor, ControlElement.x - 1, ControlElement.y, ControlElement.textColor, ControlElement.borderColor, "<")
         end
         local textLen = string.len(text)
         if textLen > ControlElement.w then
           text = string.sub(text, 1, ControlElement.w)
-          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y)
-          ControlElement.monitor.setBackgroundColor(ControlElement.borderColor)
-          ControlElement.monitor.setTextColor(ControlElement.textColor)
-          ControlElement.monitor.write(">")
+          GUI.drawText(ControlElement.monitor, ControlElement.x + ControlElement.w, ControlElement.y, ControlElement.textColor, ControlElement.borderColor, ">")
         end
-        ControlElement.monitor.setCursorPos(ControlElement.x, ControlElement.y)
-        ControlElement.monitor.setBackgroundColor(ControlElement.backgroundColor)
-        ControlElement.monitor.setTextColor(ControlElement.textColor)
-        ControlElement.monitor.write(text)
+        GUI.drawText(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.textColor, ControlElement.backgroundColor, text)
         if ControlElement.cursorPos ~= nil then
           local printChar
           if ControlElement.cursorPos > string.len(ControlElement.text) then
@@ -257,14 +249,10 @@ function GUI.drawAll()
           else
             printChar = string.sub(ControlElement.text, ControlElement.cursorPos, ControlElement.cursorPos)
           end
-          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.cursorPos - 1 - ControlElement.textOffset, ControlElement.y)
-          ControlElement.monitor.setBackgroundColor(ControlElement.textColor)
-          ControlElement.monitor.setTextColor(ControlElement.backgroundColor)
-          ControlElement.monitor.write(printChar)
+          GUI.drawText(ControlElement.monitor, ControlElement.x + ControlElement.cursorPos - 1 - ControlElement.textOffset, ControlElement.y, ControlElement.backgroundColor, ControlElement.textColor, printChar)
         end
       elseif ControlElement.type == "progress" then
         GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, ControlElement.colorB)
-        --ControlElement.monitor.setBackgroundColor(ControlElement.color)
         if ControlElement.direction == 0 then
           GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + (ControlElement.w * ControlElement.value / 100), ControlElement.y + ControlElement.h, ControlElement.color)
         elseif ControlElement.direction == 1 then
