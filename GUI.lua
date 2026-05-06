@@ -375,25 +375,17 @@ function GUI.handleEvent(event) -- event = {os.pullEvent()}
             keyName = " "
           end
           if keyName == "backspace" then
-            tCtrl.text = string.sub(tCtrl.text, 1, tCtrl.cursorPos - 2) .. string.sub(tCtrl.text, tCtrl.cursorPos)
-            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 0)
+            tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 2, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos)
+            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
+          elseif keyName == "delete" then
+            tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 1, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos + 1)
           elseif keyName == "left" then
-            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 0)
+            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
           elseif keyName == "right" then
             tCtrl.cursorPos = math.min(tCtrl.cursorPos + 1, string.len(tCtrl.text) + 1)
           elseif string.len(keyName) == 1 and keys.getName ~= "#" then
             tCtrl.text = string.sub(tCtrl.text, 1, tCtrl.cursorPos - 1) .. keyName .. string.sub(tCtrl.text, tCtrl.cursorPos)
             tCtrl.cursorPos = tCtrl.cursorPos + 1
-          else
-            term.setCursorPos(1, 1)
-            term.setBackgroundColor(colors.black)
-            term.setTextColor(colors.white)
-            term.write(keyName)
-            term.write("|")
-            term.write(event[2])
-            term.write("|")
-            term.write(string.char(event[2]))
-            sleep(1)
           end
         end
       end
