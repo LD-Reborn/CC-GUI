@@ -134,158 +134,136 @@ function GUI.createInput(sText, x, y, w, h, bkColor, textColor)
   return Input
 end
 
-function GUI.fillRegion(mon, startX, startY, endX, endY, color)
-  tempText = ""
-  for i = startX, endX do
-    tempText = tempText .. " "
-  end
-  for i=startY, endY do
-    mon.setCursorPos(startX, i)
-    mon.setBackgroundColor(color)
-    mon.write(tempText)
-  end
+function GUI.fillRegion(Monitor, startX, startY, endX, endY, color)
+  local isMonitor = Monitor ~= term
+  if isMonitor then term.redirect(Monitor) end
+  paintutils.drawFilledBox(startX, startY, endX, endY, color)
+  if isMonitor then term.redirect(term.native()) end
 end
 
-function GUI.drawRect(monitor, startX, startY, endX, endY, pColor)
-  tempX = math.min(startX, endX)
-  tempXa = math.max(startX, endX)
-  tempY = math.min(startY, endY)
-  tempYa = math.max(startY, endY)
-  
-  monitor.setBackgroundColor(pColor)
-  tempText = ""
-  for i=tempX, tempXa do
-    tempText = tempText .. " "
-  end
-  
-  monitor.setCursorPos(tempX, tempY)
-  monitor.write(tempText)
-  monitor.setCursorPos(tempX, tempYa)
-  monitor.write(tempText)
-  for i=tempY, tempYa do
-    monitor.setCursorPos(tempX, i)
-    monitor.write(" ")
-    monitor.setCursorPos(tempXa, i)
-    monitor.write(" ")
-  end
+function GUI.drawRect(Monitor, startX, startY, endX, endY, color)
+  local isMonitor = Monitor ~= term
+  if isMonitor then term.redirect(Monitor) end
+  paintutils.drawBox(startX, startY, endX, endY, color)
+  if isMonitor then term.redirect(term.native()) end
 end
 
 function GUI.drawAll()
-  for id, tCtrl in pairs(tObj) do
+  for id, ControlElement in pairs(tObj) do
     if id ~= "index" then
-      tCtrl.monitor.setBackgroundColor(backgroundColor)
-      tCtrl.monitor.clear()
+      ControlElement.monitor.setBackgroundColor(backgroundColor)
+      ControlElement.monitor.clear()
     end
   end
   
-  for id, tCtrl in pairs(tObj) do
+  for id, ControlElement in pairs(tObj) do
     if id ~= "index" then
-      if tCtrl.type == "button" then
-        if tCtrl.state == false then
-          tempC = tCtrl.textColor
-          tempbkC = tCtrl.bkColor
+      if ControlElement.type == "button" then
+        if ControlElement.state == false then
+          tempC = ControlElement.textColor
+          tempbkC = ControlElement.bkColor
         else
-          tempC = tCtrl.alttextColor
-          tempbkC = tCtrl.altbkColor
+          tempC = ControlElement.alttextColor
+          tempbkC = ControlElement.altbkColor
         end
-        GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + tCtrl.w, tCtrl.y + tCtrl.h, tempbkC)
-        tempY = tCtrl.y + (tCtrl.h / 2)
-        tempX = tCtrl.x + (tCtrl.w / 2) - (tCtrl.text:len() / 2)
-        tCtrl.monitor.setCursorPos(tempX, tempY)
-        tCtrl.monitor.setTextColor(tempC)
-        tCtrl.monitor.setBackgroundColor(tempbkC)
-        tCtrl.monitor.write(tCtrl.text)
-      elseif tCtrl.type == "label" then
-        tCtrl.monitor.setCursorPos(tCtrl.x, tCtrl.y)
-        tCtrl.monitor.setTextColor(tCtrl.textColor)
-        tCtrl.monitor.setBackgroundColor(tCtrl.bkColor)
-        tCtrl.monitor.write(tCtrl.text)
-      elseif tCtrl.type == "list" then
-        GUI.drawRect(tCtrl.monitor, tCtrl.x - 1, tCtrl.y - 1, tCtrl.x + tCtrl.w + 1, tCtrl.y + tCtrl.h + 1, colors.cyan)
-        GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + tCtrl.w, tCtrl.y + tCtrl. h, colors.white)
-        tCtrl.scrollactive = #tCtrl.entries - tCtrl.delCount > tCtrl.h
-        if tCtrl.scrollactive then
-          tCtrl.monitor.setBackgroundColor(tCtrl.buttonColor)
-          for i = tCtrl.y, tCtrl.y + tCtrl.h do
-            tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w - 1, i)
-            tCtrl.monitor.write(" ")
+        GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement.h, tempbkC)
+        tempY = ControlElement.y + (ControlElement.h / 2)
+        tempX = ControlElement.x + (ControlElement.w / 2) - (ControlElement.text:len() / 2)
+        ControlElement.monitor.setCursorPos(tempX, tempY)
+        ControlElement.monitor.setTextColor(tempC)
+        ControlElement.monitor.setBackgroundColor(tempbkC)
+        ControlElement.monitor.write(ControlElement.text)
+      elseif ControlElement.type == "label" then
+        ControlElement.monitor.setCursorPos(ControlElement.x, ControlElement.y)
+        ControlElement.monitor.setTextColor(ControlElement.textColor)
+        ControlElement.monitor.setBackgroundColor(ControlElement.bkColor)
+        ControlElement.monitor.write(ControlElement.text)
+      elseif ControlElement.type == "list" then
+        GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, colors.cyan)
+        GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w, ControlElement.y + ControlElement. h, colors.white)
+        ControlElement.scrollactive = #ControlElement.entries - ControlElement.delCount > ControlElement.h
+        if ControlElement.scrollactive then
+          ControlElement.monitor.setBackgroundColor(ControlElement.buttonColor)
+          for i = ControlElement.y, ControlElement.y + ControlElement.h do
+            ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w - 1, i)
+            ControlElement.monitor.write(" ")
           end
-          tCtrl.monitor.setBackgroundColor(tCtrl.buttonbkColor)
-          for i = tCtrl.y, tCtrl.y + tCtrl.h do
-            tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, i)
-            tCtrl.monitor.write(" ")
+          ControlElement.monitor.setBackgroundColor(ControlElement.buttonbkColor)
+          for i = ControlElement.y, ControlElement.y + ControlElement.h do
+            ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, i)
+            ControlElement.monitor.write(" ")
           end
-          tCtrl.monitor.setBackgroundColor(tCtrl.buttonColor)
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, tCtrl.y + (tCtrl.h / 2))
-          tCtrl.monitor.write(" ")
-          tCtrl.monitor.setBackgroundColor(tCtrl.buttonbkColor)
-          tCtrl.monitor.setTextColor(tCtrl.buttonColor)
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, tCtrl.y + (tCtrl.h / 4))
-          tCtrl.monitor.write("^")
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, tCtrl.y + (3 * tCtrl.h / 4))
-          tCtrl.monitor.write("v")
+          ControlElement.monitor.setBackgroundColor(ControlElement.buttonColor)
+          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 2))
+          ControlElement.monitor.write(" ")
+          ControlElement.monitor.setBackgroundColor(ControlElement.buttonbkColor)
+          ControlElement.monitor.setTextColor(ControlElement.buttonColor)
+          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement.h / 4))
+          ControlElement.monitor.write("^")
+          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y + (3 * ControlElement.h / 4))
+          ControlElement.monitor.write("v")
         end
         tempOffset = 0
-        for num, item in pairs(tCtrl.entries) do
-          if num >= tCtrl.scroll and num <= tCtrl.scroll + tCtrl.h then
-            tempY = num - tCtrl.scroll + tCtrl.y - tempOffset
+        for num, item in pairs(ControlElement.entries) do
+          if num >= ControlElement.scroll and num <= ControlElement.scroll + ControlElement.h then
+            tempY = num - ControlElement.scroll + ControlElement.y - tempOffset
             if item == nil then
               tempOffset = tempOffset + 1
             else
-              tCtrl.monitor.setCursorPos(tCtrl.x, tempY)
-              if tCtrl.selection == num then
-                tCtrl.monitor.setTextColor(tCtrl.selecttextColor)
-                tCtrl.monitor.setBackgroundColor(tCtrl.selectbkColor)
+              ControlElement.monitor.setCursorPos(ControlElement.x, tempY)
+              if ControlElement.selection == num then
+                ControlElement.monitor.setTextColor(ControlElement.selecttextColor)
+                ControlElement.monitor.setBackgroundColor(ControlElement.selectbkColor)
               else
-                tCtrl.monitor.setTextColor(tCtrl.textColor)
-                tCtrl.monitor.setBackgroundColor(tCtrl.bkColor)
+                ControlElement.monitor.setTextColor(ControlElement.textColor)
+                ControlElement.monitor.setBackgroundColor(ControlElement.bkColor)
               end
             end
-            tCtrl.monitor.write(item)
+            ControlElement.monitor.write(item)
           end
         end
-      elseif tCtrl.type == "input" then
-        GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + tCtrl.w - 1, tCtrl.y, tCtrl.bkColor)
-        GUI.drawRect(tCtrl.monitor, tCtrl.x - 1, tCtrl.y - 1, tCtrl.x + tCtrl.w, tCtrl.y + 1, tCtrl.borderColor)
-        local text = tCtrl.text
-        if tCtrl.textOffset > 0 then
-          text = string.sub(text, tCtrl.textOffset + 1)
-          tCtrl.monitor.setCursorPos(tCtrl.x - 1, tCtrl.y)
-          tCtrl.monitor.setBackgroundColor(tCtrl.borderColor)
-          tCtrl.monitor.setTextColor(tCtrl.textColor)
-          tCtrl.monitor.write("<")
+      elseif ControlElement.type == "input" then
+        GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + ControlElement.w - 1, ControlElement.y, ControlElement.bkColor)
+        GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w, ControlElement.y + 1, ControlElement.borderColor)
+        local text = ControlElement.text
+        if ControlElement.textOffset > 0 then
+          text = string.sub(text, ControlElement.textOffset + 1)
+          ControlElement.monitor.setCursorPos(ControlElement.x - 1, ControlElement.y)
+          ControlElement.monitor.setBackgroundColor(ControlElement.borderColor)
+          ControlElement.monitor.setTextColor(ControlElement.textColor)
+          ControlElement.monitor.write("<")
         end
         local textLen = string.len(text)
-        if textLen > tCtrl.w then
-          text = string.sub(text, 1, tCtrl.w)
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.w, tCtrl.y)
-          tCtrl.monitor.setBackgroundColor(tCtrl.borderColor)
-          tCtrl.monitor.setTextColor(tCtrl.textColor)
-          tCtrl.monitor.write(">")
+        if textLen > ControlElement.w then
+          text = string.sub(text, 1, ControlElement.w)
+          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.w, ControlElement.y)
+          ControlElement.monitor.setBackgroundColor(ControlElement.borderColor)
+          ControlElement.monitor.setTextColor(ControlElement.textColor)
+          ControlElement.monitor.write(">")
         end
-        tCtrl.monitor.setCursorPos(tCtrl.x, tCtrl.y)
-        tCtrl.monitor.setBackgroundColor(tCtrl.bkColor)
-        tCtrl.monitor.setTextColor(tCtrl.textColor)
-        tCtrl.monitor.write(text)
-        if tCtrl.cursorPos ~= nil then
+        ControlElement.monitor.setCursorPos(ControlElement.x, ControlElement.y)
+        ControlElement.monitor.setBackgroundColor(ControlElement.bkColor)
+        ControlElement.monitor.setTextColor(ControlElement.textColor)
+        ControlElement.monitor.write(text)
+        if ControlElement.cursorPos ~= nil then
           local printChar
-          if tCtrl.cursorPos > string.len(tCtrl.text) then
+          if ControlElement.cursorPos > string.len(ControlElement.text) then
             printChar = " "
           else
-            printChar = string.sub(tCtrl.text, tCtrl.cursorPos, tCtrl.cursorPos)
+            printChar = string.sub(ControlElement.text, ControlElement.cursorPos, ControlElement.cursorPos)
           end
-          tCtrl.monitor.setCursorPos(tCtrl.x + tCtrl.cursorPos - 1 - tCtrl.textOffset, tCtrl.y)
-          tCtrl.monitor.setBackgroundColor(tCtrl.textColor)
-          tCtrl.monitor.setTextColor(tCtrl.bkColor)
-          tCtrl.monitor.write(printChar)
+          ControlElement.monitor.setCursorPos(ControlElement.x + ControlElement.cursorPos - 1 - ControlElement.textOffset, ControlElement.y)
+          ControlElement.monitor.setBackgroundColor(ControlElement.textColor)
+          ControlElement.monitor.setTextColor(ControlElement.bkColor)
+          ControlElement.monitor.write(printChar)
         end
-      elseif tCtrl.type == "progress" then
-        GUI.drawRect(tCtrl.monitor, tCtrl.x - 1, tCtrl.y - 1, tCtrl.x + tCtrl.w + 1, tCtrl.y + tCtrl.h + 1, tCtrl.colorB)
-        --tCtrl.monitor.setBackgroundColor(tCtrl.color)
-        if tCtrl.direction == 0 then
-          GUI.fillRegion(tCtrl.monitor, tCtrl.x, tCtrl.y, tCtrl.x + (tCtrl.w * tCtrl.value / 100), tCtrl.y + tCtrl.h, tCtrl.color)
-        elseif tCtrl.direction == 1 then
-          GUI.fillRegion(tCtrl.monitor, tCtrl.x, math.ceil(tCtrl.y + tCtrl.h - (tCtrl.h * tCtrl.value / 100)), tCtrl.x + tCtrl.w, tCtrl.y + tCtrl.h, tCtrl.color)
+      elseif ControlElement.type == "progress" then
+        GUI.drawRect(ControlElement.monitor, ControlElement.x - 1, ControlElement.y - 1, ControlElement.x + ControlElement.w + 1, ControlElement.y + ControlElement.h + 1, ControlElement.colorB)
+        --ControlElement.monitor.setBackgroundColor(ControlElement.color)
+        if ControlElement.direction == 0 then
+          GUI.fillRegion(ControlElement.monitor, ControlElement.x, ControlElement.y, ControlElement.x + (ControlElement.w * ControlElement.value / 100), ControlElement.y + ControlElement.h, ControlElement.color)
+        elseif ControlElement.direction == 1 then
+          GUI.fillRegion(ControlElement.monitor, ControlElement.x, math.ceil(ControlElement.y + ControlElement.h - (ControlElement.h * ControlElement.value / 100)), ControlElement.x + ControlElement.w, ControlElement.y + ControlElement.h, ControlElement.color)
         end
       end
     end
@@ -318,69 +296,69 @@ function GUI.handleEvent(event) -- event = {os.pullEvent()}
     refMon = peripheral.wrap(event[2])
   end
   if event[1] == "monitor_touch" or event[1] == "mouse_click" then --event,side,x,y
-      for id, tCtrl in pairs(tObj) do
+      for id, ControlElement in pairs(tObj) do
         if id ~= "index" then
           term.setCursorPos(1, 1)
           term.setBackgroundColor(colors.black)
           term.setTextColor(colors.white)
           
-          if GUI.isSide(refMon, tCtrl.monitor) then
-            if tCtrl.type == "button" then
-              if GUI._2DhitA(event[3], event[4], tCtrl.x, tCtrl.y, tCtrl.w, tCtrl.h) then
-                if tCtrl.toggle then
-                  tCtrl.state = not tCtrl.state
+          if GUI.isSide(refMon, ControlElement.monitor) then
+            if ControlElement.type == "button" then
+              if GUI._2DhitA(event[3], event[4], ControlElement.x, ControlElement.y, ControlElement.w, ControlElement.h) then
+                if ControlElement.toggle then
+                  ControlElement.state = not ControlElement.state
                   GUI.drawAll()
                 else
-                  tCtrl.state = true
-                  tCtrl.timer = os.startTimer(tCtrl.timeout)
+                  ControlElement.state = true
+                  ControlElement.timer = os.startTimer(ControlElement.timeout)
                   GUI.drawAll()
                 end
                 term.setCursorPos(1, 1)
-                if tCtrl.onClick ~= nil then
-                  tCtrl.onClick({["id"]=id, ["state"]=tCtrl.state})
+                if ControlElement.onClick ~= nil then
+                  ControlElement.onClick({["id"]=id, ["state"]=ControlElement.state})
                 end
               end
-            elseif tCtrl.type == "list" then
-              if tCtrl.scrollactive then
-                tempWidth = tCtrl.w - 2
-                if tCtrl.scroll > 1 and GUI._2DhitA(event[3], event[4], tCtrl.x + tCtrl.w, tCtrl.y, 0, tCtrl.h / 2) then
-                  tCtrl.scroll = tCtrl.scroll - 1
-                elseif tCtrl.scroll <= (#tCtrl.entries - tCtrl.h) - 1 and GUI._2DhitA(event[3], event[4], tCtrl.x + tCtrl.w, tCtrl.y + (tCtrl. h / 2), 0, tCtrl.h / 2) then
-                  tCtrl.scroll = tCtrl.scroll + 1
+            elseif ControlElement.type == "list" then
+              if ControlElement.scrollactive then
+                tempWidth = ControlElement.w - 2
+                if ControlElement.scroll > 1 and GUI._2DhitA(event[3], event[4], ControlElement.x + ControlElement.w, ControlElement.y, 0, ControlElement.h / 2) then
+                  ControlElement.scroll = ControlElement.scroll - 1
+                elseif ControlElement.scroll <= (#ControlElement.entries - ControlElement.h) - 1 and GUI._2DhitA(event[3], event[4], ControlElement.x + ControlElement.w, ControlElement.y + (ControlElement. h / 2), 0, ControlElement.h / 2) then
+                  ControlElement.scroll = ControlElement.scroll + 1
                 end
               else
-                tempWidth = tCtrl.w
+                tempWidth = ControlElement.w
               end
-              if GUI._2DhitA(event[3], event[4], tCtrl.x, tCtrl.y, tempWidth, tCtrl.h) then
-                tempSelection = tCtrl.selection
-                tCtrl.selection = event[4] - tCtrl.y + tCtrl.scroll
-                if tCtrl.selection <= #tCtrl.entries then
-                  if tCtrl.onClick ~= nil then
-                    tCtrl.onClick(tCtrl.selection)
+              if GUI._2DhitA(event[3], event[4], ControlElement.x, ControlElement.y, tempWidth, ControlElement.h) then
+                tempSelection = ControlElement.selection
+                ControlElement.selection = event[4] - ControlElement.y + ControlElement.scroll
+                if ControlElement.selection <= #ControlElement.entries then
+                  if ControlElement.onClick ~= nil then
+                    ControlElement.onClick(ControlElement.selection)
                   end
                 else
-                  tCtrl.selection = tempSelection
+                  ControlElement.selection = tempSelection
                 end
               end
-            elseif tCtrl.type == "input" then
-              if GUI._2DhitA(event[3], event[4], tCtrl.x, tCtrl.y, tCtrl.w, tCtrl.h) then
-                local relativeClickPosition = math.min(event[3] - tCtrl.x + 1, string.len(tCtrl.text) + 1)
-                local textLen = string.len(tCtrl.text)
-                tCtrl.cursorPos = relativeClickPosition + tCtrl.textOffset
-              elseif tCtrl.cursorPos ~= nil then
-                tCtrl.cursorPos = nil
+            elseif ControlElement.type == "input" then
+              if GUI._2DhitA(event[3], event[4], ControlElement.x, ControlElement.y, ControlElement.w, ControlElement.h) then
+                local relativeClickPosition = math.min(event[3] - ControlElement.x + 1, string.len(ControlElement.text) + 1)
+                local textLen = string.len(ControlElement.text)
+                ControlElement.cursorPos = relativeClickPosition + ControlElement.textOffset
+              elseif ControlElement.cursorPos ~= nil then
+                ControlElement.cursorPos = nil
               end
             end
           end
         end
       end
   elseif event[1] == "timer" then
-    for id, tCtrl in pairs(tObj) do
+    for id, ControlElement in pairs(tObj) do
       if id ~= "index" then
-        if tCtrl.type == "button" and tCtrl.timer ~= nil then
-          if tCtrl.timer == event[2] then
-            tCtrl.timer = nil
-            tCtrl.state = false
+        if ControlElement.type == "button" and ControlElement.timer ~= nil then
+          if ControlElement.timer == event[2] then
+            ControlElement.timer = nil
+            ControlElement.state = false
           end
         end
       end
@@ -399,29 +377,29 @@ function GUI.handleEvent(event) -- event = {os.pullEvent()}
       keyName = char
     end
     if keyName ~= nil then
-      for id, tCtrl in pairs(tObj) do
-        if id ~= "index" and tCtrl.type == "input" and tCtrl.cursorPos ~= nil then
+      for id, ControlElement in pairs(tObj) do
+        if id ~= "index" and ControlElement.type == "input" and ControlElement.cursorPos ~= nil then
           if keyName == "backspace" then
-            tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 2, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos)
-            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
-            if tCtrl.textOffset > 0 then
-              tCtrl.textOffset = tCtrl.textOffset - 1
+            ControlElement.text = string.sub(ControlElement.text, 1, math.max(ControlElement.cursorPos - 2, 0)) .. string.sub(ControlElement.text, ControlElement.cursorPos)
+            ControlElement.cursorPos = math.max(ControlElement.cursorPos - 1, 1)
+            if ControlElement.textOffset > 0 then
+              ControlElement.textOffset = ControlElement.textOffset - 1
             end
           elseif keyName == "delete" then
-            tCtrl.text = string.sub(tCtrl.text, 1, math.max(tCtrl.cursorPos - 1, 0)) .. string.sub(tCtrl.text, tCtrl.cursorPos + 1)
+            ControlElement.text = string.sub(ControlElement.text, 1, math.max(ControlElement.cursorPos - 1, 0)) .. string.sub(ControlElement.text, ControlElement.cursorPos + 1)
           elseif keyName == "left" then
-            tCtrl.cursorPos = math.max(tCtrl.cursorPos - 1, 1)
+            ControlElement.cursorPos = math.max(ControlElement.cursorPos - 1, 1)
           elseif keyName == "right" then
-            tCtrl.cursorPos = math.min(tCtrl.cursorPos + 1, string.len(tCtrl.text) + 1)
+            ControlElement.cursorPos = math.min(ControlElement.cursorPos + 1, string.len(ControlElement.text) + 1)
           elseif eventIsChar then
-            tCtrl.text = string.sub(tCtrl.text, 1, tCtrl.cursorPos - 1) .. keyName .. string.sub(tCtrl.text, tCtrl.cursorPos)
-            tCtrl.cursorPos = tCtrl.cursorPos + 1
+            ControlElement.text = string.sub(ControlElement.text, 1, ControlElement.cursorPos - 1) .. keyName .. string.sub(ControlElement.text, ControlElement.cursorPos)
+            ControlElement.cursorPos = ControlElement.cursorPos + 1
           end
-          if tCtrl.cursorPos <= tCtrl.textOffset then
-            tCtrl.textOffset = tCtrl.textOffset - 1
+          if ControlElement.cursorPos <= ControlElement.textOffset then
+            ControlElement.textOffset = ControlElement.textOffset - 1
           end
-          if tCtrl.cursorPos - tCtrl.textOffset > tCtrl.w then
-            tCtrl.textOffset = tCtrl.textOffset + 1
+          if ControlElement.cursorPos - ControlElement.textOffset > ControlElement.w then
+            ControlElement.textOffset = ControlElement.textOffset + 1
           end
         end
       end
