@@ -169,8 +169,8 @@ function GUI.drawText(Monitor, x, y, textColor, backgroundColor, text)
 end
 
 function GUI.drawAll(clearMonitors)
-  if clear == nil then
-    clear = true
+  if clearMonitors == nil then
+    clearMonitors = true
   end
   for id, ControlElement in pairs(GUI.Controls) do
     if id ~= "index" then
