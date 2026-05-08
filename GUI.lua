@@ -168,11 +168,14 @@ function GUI.drawText(Monitor, x, y, textColor, backgroundColor, text)
   end)
 end
 
-function GUI.drawAll()
+function GUI.drawAll(clearMonitors)
+  if clear == nil then
+    clear = true
+  end
   for id, ControlElement in pairs(GUI.Controls) do
     if id ~= "index" then
       ControlElement.monitor.setBackgroundColor(backgroundColor)
-      ControlElement.monitor.clear()
+      if clearMonitors then ControlElement.monitor.clear() end
     end
   end
   
