@@ -6,7 +6,7 @@ Monitor.setBackgroundColor(colors.black)
 Monitor.setTextScale(0.5)
 Monitor.clear()
 
-flashLeft = false
+flashRight = false
 flashUp = false
 
 function toggleBarDirection(param)
@@ -25,7 +25,7 @@ function toggleFlashRedstone(param)
   id = param.id
   state = param.state
   if id == ButtonsFlashRight.id then
-    flashLeft = state
+    flashRight = state
   elseif id == ButtonsFlashUp.id then
     flashUp = state
   end
@@ -100,7 +100,7 @@ while true do
 
   if events[1] == "timer" then
     os.startTimer(restoneFlashInterval) -- restart redstone flash timer
-    if flashLeft then rs.setOutput("right", not rs.getOutput("left")) end
+    if flashRight then rs.setOutput("right", not rs.getOutput("right")) end
     if flashUp then rs.setOutput("top", not rs.getOutput("top")) end
     if progessCounter < 100 then
       progessCounter = progessCounter + 1
