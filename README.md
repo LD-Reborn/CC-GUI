@@ -1,11 +1,12 @@
 # CC-GUI
 Computercraft toolkit for creating graphical user interfaces
 
+![monitor demo showing buttons, labels, progress bar, scrollable list with elements](docs/demo_mon1.png)
+
 features:
-- integrated terminal display: yes
-- external monitor display: yes
+- flexible choice between integrated terminal and external monitor display: yes
 - multi-monitor display: yes
-- event handling (i.e. click handling, etc.): yes
+- integrated event handling (i.e. click handling, etc.): yes
 - widgets:
   - label: yes
   - button: yes
